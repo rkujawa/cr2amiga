@@ -13,7 +13,7 @@ use IEEE.STD_LOGIC_UNSIGNED.ALL;
 --use UNISIM.VComponents.all;
 
 entity main is
-	Port (LEDS : out STD_LOGIC_VECTOR (3 downto 0);
+	Port(	LEDS : out STD_LOGIC_VECTOR (3 downto 0);
 			D_AN : out STD_LOGIC_VECTOR (3 downto 0);
 			D_C : out STD_LOGIC_VECTOR (7 downto 0);
 			BTN0 : in  STD_LOGIC;
@@ -31,7 +31,7 @@ end main;
 architecture Behavioral of main is
 
 component clk_gen
-	Port (Clk : 	in STD_LOGIC;
+	Port(	Clk : 	in STD_LOGIC;
 			Clk_mod :out STD_LOGIC;
 			divide_value : in integer
 			);
@@ -40,10 +40,12 @@ end component;
 component EppModule
 	Port (Astb :	in STD_LOGIC;
 			Dstb :	in STD_LOGIC;
-			Wr :		in STD_LOGIC;
-			Wt :		out STD_LOGIC;
+			Wr :	in STD_LOGIC;
+			Wt :	out STD_LOGIC;
 			DataBus :inout STD_LOGIC_VECTOR (7 downto 0);
-			Number :	out STD_LOGIC_VECTOR (7 downto 0));
+			ssegReg :out STD_LOGIC_VECTOR (7 downto 0);
+			ledReg : out STD_LOGIC_VECTOR (3 downto 0);
+			btnReg : in STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
 component sseg
@@ -52,7 +54,7 @@ component sseg
 			segB :	in STD_LOGIC_VECTOR (7 downto 0);
 			segC :	in STD_LOGIC_VECTOR (7 downto 0);
 			segD :	in STD_LOGIC_VECTOR (7 downto 0);
-			segout :	out STD_LOGIC_VECTOR (7 downto 0);
+			segout :out STD_LOGIC_VECTOR (7 downto 0);
 			segan :	out STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
@@ -67,7 +69,8 @@ signal sHexLo : STD_LOGIC_VECTOR (3 downto 0);
 signal sHexHi : STD_LOGIC_VECTOR (3 downto 0);
 signal fullclk1 : STD_LOGIC;
 
-signal pushableReg : STD_LOGIC_VECTOR (7 downto 0);
+signal pushableReg : STD_LOGIC_VECTOR(3 downto 0);
+signal ledReg : STD_LOGIC_VECTOR(3 downto 0);
 
 begin
 
@@ -91,7 +94,9 @@ begin
 		Wr => USB_WRITE,
 		Wt => USB_WAIT,
 		DataBus => USB_D,
-		Number => sHex
+		ssegReg => sHex,
+		ledReg => ledReg,
+		btnReg => pushableReg
 	);
 	
 	sseg1 : sseg
@@ -119,14 +124,14 @@ begin
 		
 	);
 
-	-- LEDS <= "1101";
+	LEDS <= NOT ledReg;
 	sHexLo <= sHex(0) & sHex(1) & sHex(2) & sHex(3);
 	sHexHi <= sHex(4) & sHex(5) & sHex(6) & sHex(7);
 	
-	pushableReg(0) <= BTN0;
-	pushableReg(1) <= BTN1;
-	pushableReg(2) <= SW0;
-	pushableReg(3) <= SW1;
+	pushableReg(0) <= NOT BTN0;
+	pushableReg(1) <= NOT BTN1;
+	pushableReg(2) <= NOT SW0;
+	pushableReg(3) <= NOT SW1;
 
 end Behavioral;
 

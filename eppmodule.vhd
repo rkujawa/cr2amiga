@@ -24,7 +24,7 @@ begin
 	Wt <= '1' when Astb = '0' or Dstb = '0' else '0';
 
 	--DataBus <= Result when (Wr = '1') else "ZZZZZZZZ";
-	--DataBus <= "ZZZZZZZZ";
+	DataBus <= "0000" & btnReg when (Wr = '1') AND addressReg = "00000010" else "ZZZZZZZZ";
 
 	-- EPP Address register
 	process (Astb)
@@ -46,15 +46,15 @@ begin
 				elsif addressReg = "00000001" then
 					ledReg <= DataBus(0) & DataBus(1) & DataBus(2) & DataBus(3);
 				end if;
---			end if;
---			if Wr = '1' then
-			else
-				if addressReg = "00000010" then
-					DataBus <= "0000" & btnReg;
-				else
-					DataBus <= "ZZZZZZZZ";
-				end if;
 			end if;
+--			if Wr = '1' then
+--			else
+--				if addressReg = "00000010" then
+--					DataBus <= "0000" & btnReg;
+--				else
+--					DataBus <= "ZZZZZZZZ";
+--				end if;
+--			end if;
 		end if;
 	end process;
 	

@@ -32,3 +32,20 @@ NET "USB_D<4>" LOC = "22";
 NET "USB_D<5>" LOC = "21";
 NET "USB_D<6>" LOC = "20";
 NET "USB_D<7>" LOC = "19";
+
+#NET "CP_D<0>" LOC = "";		# J2-
+#NET "CP_D<1>" LOC = "";
+#NET "CP_D<2>" LOC = "";
+#NET "CP_D<3>" LOC = "";
+#NET "CP_D<4>" LOC = "";
+#NET "CP_D<5>" LOC = "";
+#NET "CP_D<6>" LOC = "";
+#NET "CP_D<7>" LOC = "";
+NET "CP_A<0>" LOC = "104";	# J2-IO1	braz
+NET "CP_A<1>" LOC = "112";	# J2-IO2 	czerwony
+NET "CP_A<2>" LOC = "136";	# J2-IO3	pomarancz
+NET "CP_A<3>" LOC = "134";	# J2-IO4	zolty
+#NET "CP_CS" LOC = "106";	# J2-IO7	zielony
+NET "CP_IORD" LOC = "113";	# J2-IO8	niebieski
+NET "CP_IOWR" LOC = "135";	# J2-IO9	fioletowy
+

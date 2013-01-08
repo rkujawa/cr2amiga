@@ -25,31 +25,35 @@ entity main is
 			USB_WAIT : out STD_LOGIC;
 			USB_WRITE : in STD_LOGIC;
 			USB_ASTB : in STD_LOGIC;
-			USB_DSTB : in STD_LOGIC);
+			USB_DSTB : in STD_LOGIC;
+			-- clockport
+			CP_A : in STD_LOGIC_VECTOR (3 downto 0);
+			CP_IORD : in STD_LOGIC;
+			CP_IOWR : in STD_LOGIC);
 end main;
 
 architecture Behavioral of main is
 
 component clk_gen
-	Port(	Clk : 	in STD_LOGIC;
-			Clk_mod :out STD_LOGIC;
-			divide_value : in integer
+	Port(	clk :	 in STD_LOGIC;
+			clkmod : out STD_LOGIC;
+			divval : in integer
 			);
 end component;
 
-component EppModule
-	Port (Astb :	in STD_LOGIC;
-			Dstb :	in STD_LOGIC;
-			Wr :	in STD_LOGIC;
-			Wt :	out STD_LOGIC;
-			DataBus :inout STD_LOGIC_VECTOR (7 downto 0);
+component eppmodule
+	Port (	astb :	in STD_LOGIC;
+			dstb :	in STD_LOGIC;
+			wr :	in STD_LOGIC;
+			wt :	out STD_LOGIC;
+			databus :inout STD_LOGIC_VECTOR (7 downto 0);
 			ssegReg :out STD_LOGIC_VECTOR (7 downto 0);
 			ledReg : out STD_LOGIC_VECTOR (3 downto 0);
 			btnReg : in STD_LOGIC_VECTOR (3 downto 0));
 end component;
 
 component sseg
-	Port (clock :	in STD_LOGIC;
+	Port (	clock :	in STD_LOGIC;
 			segA :	in STD_LOGIC_VECTOR (7 downto 0);
 			segB :	in STD_LOGIC_VECTOR (7 downto 0);
 			segC :	in STD_LOGIC_VECTOR (7 downto 0);
@@ -59,18 +63,29 @@ component sseg
 end component;
 
 component hextoseg
-	Port (hex : in  STD_LOGIC_VECTOR (3 downto 0);
+	Port (	hex : in  STD_LOGIC_VECTOR (3 downto 0);
 			seg : out  STD_LOGIC_VECTOR (7 downto 0));
+end component;
+
+component clockport
+   Port(	-- clockport signals
+		addressIn :	in STD_LOGIC_VECTOR (3 downto 0);
+		iord :		in STD_LOGIC;
+		iowr :		in STD_LOGIC;
+		addressOut : out STD_LOGIC_VECTOR (3 downto 0));
 end component;
 			
 signal sA, sB, sC, sD : STD_LOGIC_VECTOR (7 downto 0);
 signal sHex : STD_LOGIC_VECTOR (7 downto 0);
 signal sHexLo : STD_LOGIC_VECTOR (3 downto 0);
 signal sHexHi : STD_LOGIC_VECTOR (3 downto 0);
-signal fullclk1 : STD_LOGIC;
+signal slowclk : STD_LOGIC;
 
 signal pushableReg : STD_LOGIC_VECTOR(3 downto 0);
 signal ledReg : STD_LOGIC_VECTOR(3 downto 0);
+
+-- only for debugging
+signal cpAddress : STD_LOGIC_VECTOR (3 downto 0);
 
 begin
 
@@ -82,18 +97,18 @@ begin
 
 	clk_gen_inst1 : clk_gen
 	port map (
-		Clk => MCLK,
-		Clk_mod => fullclk1,
-		divide_value => 500 -- 8MHz / 500 = circa 16kHz
+		clk => MCLK,
+		clkmod => slowclk,
+		divval => 500 -- 8MHz / 500 = circa 16kHz
 	);
 
-	EppModule1 : EppModule 
+	deppusb : eppmodule 
 	port map (
-		Astb => USB_ASTB,
-		Dstb => USB_DSTB,
-		Wr => USB_WRITE,
-		Wt => USB_WAIT,
-		DataBus => USB_D,
+		astb => USB_ASTB,
+		dstb => USB_DSTB,
+		wr => USB_WRITE,
+		wt => USB_WAIT,
+		dataBus => USB_D,
 		ssegReg => sHex,
 		ledReg => ledReg,
 		btnReg => pushableReg
@@ -101,7 +116,7 @@ begin
 	
 	sseg1 : sseg
 	port map (
-		clock => fullclk1,
+		clock => slowclk,
 		segA => sA,
 		segB => sB,
 		segC => sC,
@@ -124,7 +139,17 @@ begin
 		
 	);
 
-	LEDS <= NOT ledReg;
+	amigacp : clockport
+	port map (
+		addressIn => CP_A,
+		iord => CP_IORD,
+		iowr => CP_IOWR,
+		addressOut => cpAddress
+	);
+
+	--LEDS <= NOT ledReg;
+	LEDS <= cpAddress;
+	
 	sHexLo <= sHex(0) & sHex(1) & sHex(2) & sHex(3);
 	sHexHi <= sHex(4) & sHex(5) & sHex(6) & sHex(7);
 	
@@ -134,4 +159,3 @@ begin
 	pushableReg(3) <= NOT SW1;
 
 end Behavioral;
-

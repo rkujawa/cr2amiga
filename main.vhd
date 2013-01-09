@@ -28,6 +28,7 @@ entity main is
 			USB_DSTB : in STD_LOGIC;
 			-- clockport
 			CP_A : in STD_LOGIC_VECTOR (3 downto 0);
+			CP_D : inout STD_LOGIC_VECTOR (7 downto 0);
 			CP_IORD : in STD_LOGIC;
 			CP_IOWR : in STD_LOGIC);
 end main;
@@ -69,16 +70,21 @@ end component;
 
 component clockport
    Port(	-- clockport signals
+		data :		inout STD_LOGIC_VECTOR (7 downto 0);
 		addressIn :	in STD_LOGIC_VECTOR (3 downto 0);
 		iord :		in STD_LOGIC;
 		iowr :		in STD_LOGIC;
-		addressOut : out STD_LOGIC_VECTOR (3 downto 0));
+		addressOut : out STD_LOGIC_VECTOR (3 downto 0);
+		testOut : 	out STD_LOGIC_VECTOR (7 downto 0));
 end component;
 			
 signal sA, sB, sC, sD : STD_LOGIC_VECTOR (7 downto 0);
 signal sHex : STD_LOGIC_VECTOR (7 downto 0);
 signal sHexLo : STD_LOGIC_VECTOR (3 downto 0);
 signal sHexHi : STD_LOGIC_VECTOR (3 downto 0);
+signal sHex2 : STD_LOGIC_VECTOR (7 downto 0);
+signal sHex2Lo : STD_LOGIC_VECTOR (3 downto 0);
+signal sHex2Hi : STD_LOGIC_VECTOR (3 downto 0);
 signal slowclk : STD_LOGIC;
 
 signal pushableReg : STD_LOGIC_VECTOR(3 downto 0);
@@ -131,27 +137,42 @@ begin
 		seg => sA
 		
 	);
-	
 	hextoseghi : hextoseg
 	port map (
 		hex => sHexHi,
 		seg => sB
+	);
+
+	hextoseglo2 : hextoseg
+	port map (
+		hex => sHex2Lo,
+		seg => sC
 		
 	);
+	hextoseghi2 : hextoseg
+	port map (
+		hex => sHex2Hi,
+		seg => sD
+	);
+
 
 	amigacp : clockport
 	port map (
+		data => CP_D,
 		addressIn => CP_A,
 		iord => CP_IORD,
 		iowr => CP_IOWR,
-		addressOut => cpAddress
+		addressOut => cpAddress,
+		testOut => sHex2
 	);
 
 	--LEDS <= NOT ledReg;
-	LEDS <= cpAddress;
+	LEDS <= NOT cpAddress;
 	
 	sHexLo <= sHex(0) & sHex(1) & sHex(2) & sHex(3);
 	sHexHi <= sHex(4) & sHex(5) & sHex(6) & sHex(7);
+	sHex2Lo <= sHex2(0) & sHex2(1) & sHex2(2) & sHex2(3);
+	sHex2Hi <= sHex2(4) & sHex2(5) & sHex2(6) & sHex2(7);	
 	
 	pushableReg(0) <= NOT BTN0;
 	pushableReg(1) <= NOT BTN1;

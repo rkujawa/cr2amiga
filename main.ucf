@@ -45,7 +45,7 @@ NET "CP_A<0>" LOC = "142";	# J2-IO1	braz
 NET "CP_A<1>" LOC = "139";	# J2-IO2 	czerwony
 NET "CP_A<2>" LOC = "136";	# J2-IO3	pomarancz
 NET "CP_A<3>" LOC = "134";	# J2-IO4	zolty
-#NET "CP_CS" LOC = "106";	# J2-IO7	zielony
-NET "CP_IORD" LOC = "138";	# J2-IO8	niebieski
-NET "CP_IOWR" LOC = "135";	# J2-IO9	fioletowy
+NET "CP_CS" LOC = "140";	# J2-IO7	zielony
+NET "CP_IORD" LOC = "135";	# J2-IO8	niebieski
+NET "CP_IOWR" LOC = "138";	# J2-IO9	fioletowy
 

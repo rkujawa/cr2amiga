@@ -7,7 +7,7 @@ entity clockport is
 			addressIn :	in STD_LOGIC_VECTOR (3 downto 0); -- address pins
 			iord :		in STD_LOGIC; -- active low when read from device to CPU
 			iowr :		in STD_LOGIC; -- active low when write from CPU to device
-			--cs :		in STD_LOGIC;
+			cs :		in STD_LOGIC;
 			-- debug signals
 			addressOut : out STD_LOGIC_VECTOR (3 downto 0);
 			-- registers used to exchange data
@@ -21,20 +21,18 @@ architecture Behavioral of clockport is
 	signal address : STD_LOGIC_VECTOR (3 downto 0);
 
 begin
-	address <= addressIn when iord = '0' or iowr = '0';
+	address <= addressIn when cs = '0' and (iord = '0' or iowr = '0');
 	addressOut <= address;
 
-	process (iord)
+	data <= "00000001" when (iord = '0' and cs = '0') AND address = "1111" else
+			   -- somereg when (Wr = '1') AND address = "xxxxxxxx" else
+			   "ZZZZZZZZ";
+
+	process (iowr, cs)
 	begin
-		if rising_edge(iord) then
+		if iowr = '0' and cs = '0' then
 			testOut <= data;
 		end if;
 	end process;
---	process (iowr)
---	begin
---		if falling_edge(iowr) then
---			data <= "00000001";
---		end if;
---	end process;
 
 end Behavioral;

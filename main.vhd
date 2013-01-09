@@ -27,6 +27,7 @@ entity main is
 			USB_ASTB : in STD_LOGIC;
 			USB_DSTB : in STD_LOGIC;
 			-- clockport
+			CP_CS : in STD_LOGIC;
 			CP_A : in STD_LOGIC_VECTOR (3 downto 0);
 			CP_D : inout STD_LOGIC_VECTOR (7 downto 0);
 			CP_IORD : in STD_LOGIC;
@@ -74,6 +75,7 @@ component clockport
 		addressIn :	in STD_LOGIC_VECTOR (3 downto 0);
 		iord :		in STD_LOGIC;
 		iowr :		in STD_LOGIC;
+		cs :		in STD_LOGIC;
 		addressOut : out STD_LOGIC_VECTOR (3 downto 0);
 		testOut : 	out STD_LOGIC_VECTOR (7 downto 0));
 end component;
@@ -162,6 +164,7 @@ begin
 		addressIn => CP_A,
 		iord => CP_IORD,
 		iowr => CP_IOWR,
+		cs => CP_CS,
 		addressOut => cpAddress,
 		testOut => sHex2
 	);

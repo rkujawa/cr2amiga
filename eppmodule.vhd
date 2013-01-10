@@ -14,7 +14,9 @@ entity eppmodule is
 			-- internal registers used to exchange the data
 			ssegReg :	out STD_LOGIC_VECTOR (7 downto 0);
 			ledReg :	out STD_LOGIC_VECTOR (3 downto 0);
-			btnReg :	in STD_LOGIC_VECTOR (3 downto 0));
+			btnReg :	in STD_LOGIC_VECTOR (7 downto 0);
+			commDataOutReg : out STD_LOGIC_VECTOR (7 downto 0);
+			commDataInReg: in STD_LOGIC_VECTOR(7 downto 0));
 end EppModule;
 
 architecture Behavioral of eppmodule is
@@ -26,7 +28,8 @@ begin
 	-- don't wait if address strobe or data strobe active
 	wt <= '1' when astb = '0' or dstb = '0' else '0';
 
-	databus <= "0000" & btnReg when (wr = '1') AND address = "00000010" else
+	databus <=	commDataInReg when (wr = '1') and address = "00000001" else
+				btnReg when (wr = '1') and address = "00000010" else
 			   -- somereg when (Wr = '1') AND address = "xxxxxxxx" else
 			   "ZZZZZZZZ";
 
@@ -44,6 +47,8 @@ begin
 				if address = "00000000" then
 					ssegReg <= databus;
 				elsif address = "00000001" then
+					commDataOutReg <= databus;
+				elsif address = "00000010" then
 					ledReg <= databus(0) & databus(1) & databus(2) & databus(3);
 				end if;
 			end if;

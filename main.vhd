@@ -51,7 +51,9 @@ component eppmodule
 			databus :inout STD_LOGIC_VECTOR (7 downto 0);
 			ssegReg :out STD_LOGIC_VECTOR (7 downto 0);
 			ledReg : out STD_LOGIC_VECTOR (3 downto 0);
-			btnReg : in STD_LOGIC_VECTOR (3 downto 0));
+			btnReg : in STD_LOGIC_VECTOR (7 downto 0);
+			commDataOutReg : out STD_LOGIC_VECTOR (7 downto 0);
+			commDataInReg: in STD_LOGIC_VECTOR(7 downto 0));
 end component;
 
 component sseg
@@ -70,14 +72,18 @@ component hextoseg
 end component;
 
 component clockport
-   Port(	-- clockport signals
-		data :		inout STD_LOGIC_VECTOR (7 downto 0);
-		addressIn :	in STD_LOGIC_VECTOR (3 downto 0);
-		iord :		in STD_LOGIC;
-		iowr :		in STD_LOGIC;
-		cs :		in STD_LOGIC;
-		addressOut : out STD_LOGIC_VECTOR (3 downto 0);
-		testOut : 	out STD_LOGIC_VECTOR (7 downto 0));
+	Port(	-- clockport signals
+			data :		inout STD_LOGIC_VECTOR (7 downto 0);
+			addressIn :	in STD_LOGIC_VECTOR (3 downto 0);
+			iord :		in STD_LOGIC;
+			iowr :		in STD_LOGIC;
+			cs :		in STD_LOGIC;
+			--addressOut : out STD_LOGIC_VECTOR (3 downto 0);
+			btnReg : 	in STD_LOGIC_VECTOR (7 downto 0);
+			ledReg :	out STD_LOGIC_VECTOR (3 downto 0);
+			testOut : 	out STD_LOGIC_VECTOR (7 downto 0);
+			commDataOutReg : out STD_LOGIC_VECTOR (7 downto 0);
+			commDataInReg: in STD_LOGIC_VECTOR(7 downto 0));
 end component;
 			
 signal sA, sB, sC, sD : STD_LOGIC_VECTOR (7 downto 0);
@@ -89,11 +95,14 @@ signal sHex2Lo : STD_LOGIC_VECTOR (3 downto 0);
 signal sHex2Hi : STD_LOGIC_VECTOR (3 downto 0);
 signal slowclk : STD_LOGIC;
 
-signal pushableReg : STD_LOGIC_VECTOR(3 downto 0);
+signal pushableReg : STD_LOGIC_VECTOR(7 downto 0);
 signal ledReg : STD_LOGIC_VECTOR(3 downto 0);
 
+signal commDataAtoU : STD_LOGIC_VECTOR (7 downto 0);
+signal commDataUtoA : STD_LOGIC_VECTOR (7 downto 0);
+
 -- only for debugging
-signal cpAddress : STD_LOGIC_VECTOR (3 downto 0);
+--signal cpAddress : STD_LOGIC_VECTOR (3 downto 0);
 
 begin
 
@@ -118,8 +127,10 @@ begin
 		wt => USB_WAIT,
 		dataBus => USB_D,
 		ssegReg => sHex,
-		ledReg => ledReg,
-		btnReg => pushableReg
+--		ledReg => ledReg,
+		btnReg => pushableReg,
+		commDataInReg => commDataAtoU,
+		commDataOutReg => commDataUtoA
 	);
 	
 	sseg1 : sseg
@@ -165,12 +176,15 @@ begin
 		iord => CP_IORD,
 		iowr => CP_IOWR,
 		cs => CP_CS,
-		addressOut => cpAddress,
-		testOut => sHex2
+		btnReg => pushableReg,
+		ledReg => ledReg,
+		testOut => sHex2,
+		commDataInReg => commDataUtoA,
+		commDataOutReg => commDataAtoU
 	);
 
-	--LEDS <= NOT ledReg;
-	LEDS <= NOT cpAddress;
+	LEDS <= NOT ledReg;
+	--LEDS <= NOT cpAddress;
 	
 	sHexLo <= sHex(0) & sHex(1) & sHex(2) & sHex(3);
 	sHexHi <= sHex(4) & sHex(5) & sHex(6) & sHex(7);
